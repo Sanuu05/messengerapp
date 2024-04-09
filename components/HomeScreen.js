@@ -4,23 +4,25 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useDispatch, useSelector } from 'react-redux'
 import Icon from 'react-native-vector-icons/Ionicons'
-import { getalluser, loadUser, emploadmsg, editprofilepic } from '../action/user'
-import { io } from "socket.io-client"
+import { getalluser, loadUser, emploadmsg, editprofilepic, getActiveUser } from '../action/user'
+import socket from '../action/socketManager'
+import FabButton from './FabButton'
 const { width, height } = Dimensions.get('screen')
 
 const HomeScreen = () => {
-    const ma = [1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 1, 2, 3, 4, 5]
     const navigate = useNavigation()
     const dispatch = useDispatch()
     const [reload, setreload] = useState()
-    const port = "https://newmsgm.herokuapp.com"
-    // const port = "http://192.168.29.100:5555"
+    const port = "https://veajqzj9se.execute-api.ap-south-1.amazonaws.com"
+    // const port = "http://192.168.137.1:8080"
     const appState = useRef(AppState.currentState);
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
     const succtok = useSelector((state) => state.user.token)
     const userad = useSelector((state => state.user.user))
+    const userall = useSelector((state => state.all?.allActiveUser))
+    const userId = useSelector((state => state?.user?.user?.user?._id))
     const [token, settoken] = useState()
-    console.log('tokenn', userad?.user?._id)
+    console.log('tokenn', userall)
     useEffect(() => {
         const subscription = AppState.addEventListener("change", nextAppState => {
             if (
@@ -60,61 +62,58 @@ const HomeScreen = () => {
     const [online, setonline] = useState(false)
     useFocusEffect(
         React.useCallback(() => {
-            dispatch(getalluser())
+            dispatch(getActiveUser())
             dispatch(editprofilepic({ online: true }))
             dispatch(loadUser())
             dispatch(emploadmsg())
-            // getTheme()
-            const socket = io(port)
-            socket.on('new-message', function (data) {
-                // console.log('Got announcement:', data);
-                setreload(data)
-                // setModalVisible(false)
-            });
-        }, [dispatch, reload, online])
+            // socket.emit('authenticate', userId);
+            // socket.on('new-message', function (data) {
+            //     setreload(data)
+            // });
+        }, [])
 
 
     )
-    const [refreshing, setRefreshing] = useState(false);
+
+    useEffect(() => {
+
+        socket.on('chatMessage',function (data) {
+            dispatch(getActiveUser())
+        });
 
 
-    const user = useSelector((state => state.all.alluser))
+    }, [])
+  
     const succ = useSelector((state) => state.user.token)
-
-    // console.log('userdatsas',userad?.alluser)
-
     const Chatlist = ({ v, serach }) => {
+        console.log('userx',v)
         const user = useSelector((state => state.user.user))
-        // console.log('sera',serach)
-
-        const filter = user?.user?.msg?.filter(p => p.user == v?._id)
-
-        const latest = filter ? filter[0] : null
-        // console.log('vbvb',filter)
-        if (user?.user?._id === v?._id) {
-            return null
-        } else {
+        // const filter = user?.user?.msg?.filter(p => p.user == v?._id)
+        // const latest = filter ? filter[0] : null
+        // if (user?.user?._id === v?._id) {
+        //     return null
+        // } else {
             return (
 
-                <TouchableOpacity activeOpacity={0.8} style={{ display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'stretch' }} onPress={() => navigate.navigate('Msg', v)} >
+                <TouchableOpacity activeOpacity={0.8} style={{ display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'stretch' }} onPress={() => navigate.navigate('Msg', {...v,type:v?.userDetails?"user":"group"})} >
                     <Image source={{
-                        uri: v?.profilePic ? v?.profilePic : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+                        uri: v?.userDetails?.profilePic ? v?.userDetails?.profilePic? v?.groupDetails?.profilePic: v?.groupDetails?.profilePic : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
                     }} style={{ height: 55, width: 55, resizeMode: 'cover', borderRadius: 999 }} />
                     <View style={{ marginLeft: 13, marginTop: 2, borderBottomColor: '#8B8585', flex: 1 }}>
-                        <Text style={{ fontSize: 21, fontFamily: 'Alegreya_700Bold', letterSpacing: 1, color: '#676D6F' }}>{v?.name}</Text>
+                        <Text style={{ fontSize: 21, fontFamily: 'Alegreya_700Bold', letterSpacing: 1, color: '#676D6F' }}>{v?.userDetails?.name ? v?.userDetails?.name:v?.groupDetails?.name}</Text>
                         {
-                            latest?.text ? <Text style={{ fontSize: 13, fontFamily: 'Alegreya_500Medium', letterSpacing: 1, color: '#C9CBD5' }}>{latest?.text?.length > 30 ? `${latest?.text?.slice(0, 30)}......` : latest?.text}</Text> : null
+                            v?.recentMessage ? <Text style={{ fontSize: 13, fontFamily: 'Alegreya_500Medium', letterSpacing: 1, color: '#C9CBD5' }}>{v?.recentMessage?.length > 30 ? `${v?.recentMessage?.slice(0, 30)}......` : v?.recentMessage}</Text> : null
 
                         }
                         {
-                            latest?.pic ? <Text style={{ fontSize: 13, fontFamily: 'Alegreya_500Medium', letterSpacing: 1, color: '#C9CBD5' }}>image</Text> : null
+                            v?.recentMedia ? <Text style={{ fontSize: 13, fontFamily: 'Alegreya_500Medium', letterSpacing: 1, color: '#C9CBD5' }}>{new URL(v?.recentMedia).pathname.split('/').pop()}</Text> : null
 
                         }
 
                     </View>
                 </TouchableOpacity>
             )
-        }
+        // }
 
     }
     const [serach, setsearch] = useState()
@@ -124,9 +123,7 @@ const HomeScreen = () => {
 
         const filte = serach ? setalluser(userad?.alluser?.filter(p => p.name == serach || p.email == serach)) : setalluser(online ? userad?.alluser?.filter(p => p.online == online) : userad?.alluser)
     }, [serach, reload, userad, online])
-    // console.log('all',alluser)
     const succn = useSelector((state) => state.user.user)
-    console.log("vbvb", succ?.user)
     const succ1 = useSelector((state) => state.user.signin)
     useFocusEffect(
         React.useCallback(() => {
@@ -138,8 +135,7 @@ const HomeScreen = () => {
         }, [dispatch, succ])
     )
     return (
-
-        <SafeAreaView style={{ backgroundColor: 'white', height: height }}>
+        <View style={{flex:1,backgroundColor:'white'}}>
             <View style={{ elevation: 1, backgroundColor: 'white' }}>
                 <View style={{ marginLeft: 9 }}>
                     <Text style={{ fontSize: 32, letterSpacing: 1.8, marginLeft: 8, marginTop: 15, fontFamily: 'Alegreya_700Bold' }}>Messages</Text>
@@ -161,10 +157,10 @@ const HomeScreen = () => {
 
                 </View>
             </View>
-            <View style={{ marginHorizontal: 18, marginTop: 15, height: height - 150 }}>
+            <View style={{ marginHorizontal: 18, marginTop: 15 }}>
                 <ScrollView contentContainerStyle={{ paddingBottom: 200 }}>
                     {
-                        alluser?.map((v, i) => {
+                        userall?.map((v, i) => {
                             return (
                                 <Chatlist v={v} key={i} serach={serach} />
                             )
@@ -172,7 +168,9 @@ const HomeScreen = () => {
                     }
                 </ScrollView>
             </View>
-        </SafeAreaView>
+            
+        <FabButton/>
+        </View>
 
 
     )

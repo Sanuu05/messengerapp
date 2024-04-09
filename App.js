@@ -2,8 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import {NavigationContainer} from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Login from './components/Login';
-import {Provider, useDispatch} from 'react-redux';
+import {Provider, useDispatch, useSelector} from 'react-redux';
 import { createStore, applyMiddleware, compose} from 'redux'
 import thunk from 'redux-thunk'
 import reducers from './reducers'
@@ -25,9 +24,17 @@ import Bottonav from './components/Bottonav';
 import Message from './components/Message';
 const Stack = createNativeStackNavigator();
 const store = createStore(reducers, compose(applyMiddleware(thunk)))
-
+import { useEffect } from 'react';
+import CreateGroup from './components/CreateGroup';
+import Login from './screens/Login';
 
 export default function App() {
+
+  // const userId = useSelector((state => state?.user?.user?.user?._id))
+  // useEffect(()=>{
+  //   socket.emit('authenticate', userId);
+
+  // },[])
   let [fontsLoaded] = useFonts({
     Alegreya_400Regular,
     Alegreya_400Regular_Italic,
@@ -58,6 +65,10 @@ export default function App() {
          <Stack.Screen name="Msg" component={Message} options={{
           headerShown:false
         }} />
+          <Stack.Screen name="CreateGroup" component={CreateGroup} options={{
+          headerShown:false
+        }} />
+        
       </Stack.Navigator>
       </NavigationContainer>
       </Provider>

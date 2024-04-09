@@ -1,5 +1,6 @@
 const initail ={
-    alluser:[]
+    alluser:[],
+    allActiveUser:[]
 }
 const all = (state=initail, action)=>{
     switch(action.type){
@@ -7,10 +8,11 @@ const all = (state=initail, action)=>{
             return {
                 alluser:action.payload.data
             }
-        // case "USERMSG":
-        //     return{
-        //         allmsg:action.payload.data
-        //     }    
+        case "GETALLACTIVEUSER":
+            return{
+                ...state,
+                allActiveUser:action.payload.data
+            }    
         default:
             return state    
     }

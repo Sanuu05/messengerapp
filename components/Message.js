@@ -11,7 +11,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { delmsg, emploadmsg, loadmsg, loadoneuser, sendmsg } from '../action/user'
 const { width, height } = Dimensions.get('screen')
 import * as ImagePicker from 'expo-image-picker';
-import { io } from "socket.io-client"
+// import { io } from "socket.io-client"
+import socket from '../action/socketManager'
 // import { Button } from 'react-native-web'
 
 const Message = (props) => {
@@ -23,26 +24,32 @@ const Message = (props) => {
     const dispatch = useDispatch()
     const [imagedata, setimagedata] = useState()
     const [reload, setreload] = useState()
+    const [allMsg,setAllMsg]= useState([])
     // console.log('mmm',)
-    const port = "https://newmsgm.herokuapp.com"
-    // const port = "http://192.168.29.100:5555"
+    // const port = "https://msg-snya.onrender.com"
+    // const port = "http://192.168.137.1:5555"
 
     const userad = useSelector((state => state?.user?.user?.user?._id))
-    const mainuser = useSelector(state => state?.user)
+    const mainer = useSelector(state => state?.user)
     const loading = useSelector((state) => state.user.load)
     const user = useSelector((state => state.all.alluser))
 
     const filter = user.find(p => p._id == props.route?.params?._id)
     const msg = useSelector((state) => state.allmsg.allmsg?.msg)
     const muser = useSelector((state) => state.allmsg.allmsg?.user)
-    // console.log('cvf', mainuser)
+    // const socket = io(port)
+    // console.log(">>>>>>>>>>>>>>>>",props.route?.params?.type)
+    useEffect(()=>{
+        setAllMsg(msg)
+
+    },JSON.stringify(msg))
     useEffect(() => {
 
 
         if (props.route?.params?._id) {
-            dispatch(loadmsg(props.route?.params?._id))
+            dispatch(loadmsg(props.route?.params?._id,props.route?.params?.type))
             // dispatch(loadoneuser(props.route?.params?._id))
-            console.log('reload')
+            // console.log('reload')
 
 
         }
@@ -50,44 +57,61 @@ const Message = (props) => {
     }, [dispatch, props.route?.params?._id, reload])
     useEffect(() => {
 
+        if (props.route.params?.type=="group" && props.route.params._id) {
+            console.log(">>>><<<>><>><>>>>>")
+            socket.emit('joinRoom', props.route.params._id);
+          }
 
+        
 
-        const socket = io(port)
-        socket.on('new-message', function (data) {
-            if (String(userad) == String(data?.id) || String(userad) == String(data?.sid)) {
-                console.log('Got announcement:', data);
-                const random = Math.random()
-                setreload(`${data?.msg}${random}`)
-                setModalVisible(false)
-
-            }
-
+        socket.on('chatMessage',function (data) {
+            setAllMsg((prev)=>[...prev,data])
+            // console.log(">>>>>>>>>>>>>>>>>>>>.",data)
         });
-        socket.on('del-message', function (data) {
-            console.log('del announcement:', data);
-            if (String(data?.id) == userad) {
-                setreload(data?.msgid)
-            }
-
+        socket.on('connected',function (data) {
+            // setAllMsg((prev)=>[...prev,data])
+            console.log(">>>>>>>>>>>>>>>>>>>>.connected",data)
         });
-        socket.on('update', function (data) {
-            // console.log('del announcement:', data);
-            console.log('up', data)
-            console.log('upAD', userad)
-            // console.log('up12', props.route?.params?._id)
-            // const random = Math?.random()
-            //   setreload(`${random}`)
-            if (String(props.route?.params?._id) == String(data)|| String(userad) == String(data) ) {
-                //   setModalVisible(false)
-                console.log('equal')
-                //   setload(false)
-                const random = Math?.random()
-                setreload(`${random}`)
+        // socket.on('new-message', function (data) {
+        //     if (String(userad) == String(data?.id) || String(userad) == String(data?.sid)) {
+        //         console.log('Got announcement:', data);
+        //         const random = Math.random()
+        //         setreload(`${data?.msg}${random}`)
+        //         setModalVisible(false)
+
+        //     }
+
+        // });
+        // socket.on('del-message', function (data) {
+        //     console.log('del announcement:', data);
+        //     if (String(data?.id) == userad) {
+        //         setreload(data?.msgid)
+        //     }
+
+        // });
+        // socket.on('update', function (data) {
+        //     // console.log('del announcement:', data);
+        //     console.log('up', data)
+        //     console.log('upAD', userad)
+        //     // console.log('up12', props.route?.params?._id)
+        //     // const random = Math?.random()
+        //     //   setreload(`${random}`)
+        //     if (String(props.route?.params?._id) == String(data)|| String(userad) == String(data) ) {
+        //         //   setModalVisible(false)
+        //         console.log('equal')
+        //         //   setload(false)
+        //         const random = Math?.random()
+        //         setreload(`${random}`)
+        //     }
+        // })
+
+
+        return () => {
+            // Leave the room when component unmounts
+            if (props.route.params?.type=="group" && props.route.params._id) {
+              socket.emit('leaveRoom', props.route.params._id);
             }
-        })
-
-
-
+          };
 
     }, [])
 
@@ -102,15 +126,24 @@ const Message = (props) => {
 
 
 
-    console.log('msg', msg?.length)
+    // console.log('msg', msg)
 
     const submit = () => {
         // alert(props.route?.params?._id)
         setmsgres('')
         
-        console.log('bvb')
+        // console.log('bvb')
         if (msgres) {
-            dispatch(sendmsg(msgres, (props.route?.params?._id), null))
+            // dispatch(sendmsg(msgres, (props.route?.params?._id), null))
+            // const socket = io(port)
+            if(props.route.params?.type=="group"){
+                socket.emit('chatMessage',{content: msgres,groupId:props.route?.params?._id,senderId:userad,type:'text'});
+            }else{
+                socket.emit('chatMessage',{content: msgres,receiverId:props.route?.params?._id,senderId:userad,type:'text'});
+            }
+           
+            setAllMsg([...allMsg,{content: msgres,receiverId:props.route?.params?._id,senderId:userad}])
+
         }
 
 
@@ -157,19 +190,21 @@ const Message = (props) => {
             base64: true,
             quality: 1,
         });
-        const source = result.base64
-        setimagedata(result)
+        // console.log("<><<><<<<<<<<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.",result?.assets[0]);
+        const source = result?.assets[0]?.base64
+     
+        setimagedata(result?.assets[0])
         if (source) {
             setModalVisible(true)
 
         }
 
         // Explore the result
-        console.log(result.uri);
+        
 
-        if (!result.cancelled) {
-            setPickedImagePath(result.uri);
-            console.log(result.uri);
+        if (!result.canceled) {
+            setPickedImagePath(result?.assets[0].uri);
+            // console.log(result.uri);
         }
     }
     const showCameraPicker = async () => {
@@ -193,11 +228,11 @@ const Message = (props) => {
         }
 
         // Explore the result
-        console.log(result.uri);
+        // console.log(result.uri);
 
         if (!result.cancelled) {
             setPickedImagePath(result.uri);
-            console.log(result.uri);
+            // console.log(result.uri);
         }
     }
     // console.log(imagedata)
@@ -225,8 +260,12 @@ const Message = (props) => {
                     let data = await response.json();
                     if (data.secure_url) {
                         //   alert('Upload successful');
-
-                        dispatch(sendmsg(msgres, props.route?.params?._id, data.secure_url))
+                        socket.emit('chatMessage',{content: '',mediaUrl:data.secure_url,receiverId:props.route?.params?._id,senderId:userad,type:'image'});
+                        setAllMsg([...allMsg,{content: '',mediaUrl:data.secure_url,receiverId:props.route?.params?._id,senderId:userad}])
+                        setModalVisible(false)
+                        setPickedImagePath('')
+                        setload(false)
+                        // dispatch(sendmsg(msgres, props.route?.params?._id, data.secure_url))
                     }
                 })
                 .catch(err => {
@@ -241,9 +280,9 @@ const Message = (props) => {
 
         useFocusEffect(
             React.useCallback(() => {
-                const socket = io(port)
+                // const socket = io(port)
 
-                socket.on('del-message', function (data) {
+                socket.on('chatMessage', function (data) {
                     // console.log('del announcement:', data);
                     setModalVisible(false)
                 });
@@ -280,20 +319,20 @@ const Message = (props) => {
             </View>
 
             {
-                v?.text ? <Text onLongPress={() => {
+                v?.content ? <Text onLongPress={() => {
                     setdelitem({ id: v?._id, type: "Message" })
                     setModalVisible(true)
-                }} style={{ fontSize: 17, fontFamily: 'Alegreya_700Bold', backgroundColor: v?.sent ? '#2176FF' : "#F4F4F4", alignSelf: v?.sent ? 'flex-end' : 'flex-start', marginTop: 0, color: v?.sent ? '#BCD7FF' : '#8D9293', minWidth: 130, textAlign: 'center', marginHorizontal: 15, paddingHorizontal: 20, paddingVertical: 15, elevation: 0,borderBottomRightRadius:50,borderTopRightRadius:v?.sent ?null: 50,borderTopLeftRadius:50,borderBottomLeftRadius:v?.sent?50:null}}>{v?.text}</Text> : null
+                }} style={{ fontSize: 17, fontFamily: 'Alegreya_700Bold', backgroundColor: v?.senderId==userad ? '#2176FF' : "#F4F4F4", alignSelf: v?.senderId==userad? 'flex-end' : 'flex-start', marginTop: 0, color: v?.senderId==userad  ? '#BCD7FF' : '#8D9293', minWidth: 130, textAlign: 'center', marginHorizontal: 15, paddingHorizontal: 20, paddingVertical: 15, elevation: 0,borderBottomRightRadius:50,borderTopRightRadius:v?.senderId==userad ?null: 50,borderTopLeftRadius:50,borderBottomLeftRadius:v?.senderId==userad?50:null}}>{v?.content}</Text> : null
             }
             {/* onLongPress={() => dispatch(delmsg(v._id))} */}
             {
-                v?.pic ? <TouchableOpacity activeOpacity={1} onLongPress={() => {
+                v?.mediaUrl ? <TouchableOpacity activeOpacity={1} onLongPress={() => {
                     setdelitem({ id: v?._id, type: "Image" })
                     setModalVisible(true)
                 }}>
                     <Image source={{
-                        uri: v?.pic
-                    }} style={{ width: width-120, height: undefined, aspectRatio:1, alignSelf: v?.sent ? 'flex-end' : 'flex-start', marginTop: 10, marginHorizontal: 15, paddingHorizontal: 20, paddingVertical: 10 }} />
+                        uri: v?.mediaUrl
+                    }} style={{ width: width-120, height: undefined, aspectRatio:1, alignSelf:  v?.senderId==userad ? 'flex-end' : 'flex-start', marginTop: 10, marginHorizontal: 15, paddingHorizontal: 20, paddingVertical: 10 }} />
 
                 </TouchableOpacity>
                     : null
@@ -454,7 +493,7 @@ const Message = (props) => {
                                 
 
                                 {
-                                    msg?.map((v, i) => {
+                                    allMsg?.map((v, i) => {
                                         return (
 
                                             <Msgdiv v={v} key={i} />
@@ -478,7 +517,7 @@ const Message = (props) => {
                             {/* <Icon1 name='image' size={30} color="#557BF3" style={{ marginHorizontal: 5 }} onPress={() => setModalVisible(true)} />
                             <Icon1 name='image' size={30} color="#557BF3" style={{ marginHorizontal: 5 }} onPress={() => setModalVisible(false)} /> */}
                             <TouchableOpacity activeOpacity={0.5} onPress={submit} style={{backgroundColor:'#E76F51',height:55,width:55,display:'flex',justifyContent:'center',alignItems:'center',borderRadius:999}}>
-                                <Icon name='md-send' size={20} color="white" />
+                                <Icon name='send' size={20} color="white" />
                             </TouchableOpacity>
                         </View>
 

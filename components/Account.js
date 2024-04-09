@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { editprofilepic, loadUser, logout } from '../action/user'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import * as ImagePicker from 'expo-image-picker';
-import { io } from "socket.io-client"
+// import { io } from "socket.io-client"
 const { width, height } = Dimensions.get('screen')
 
 const Account = () => {
@@ -14,8 +14,8 @@ const Account = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [imagedata, setimagedata] = useState()
   const [reload, setrelaod] = useState()
-  const port = "https://newmsgm.herokuapp.com"
-  // const port = "http://192.168.29.100:5555"
+  const port = "https://veajqzj9se.execute-api.ap-south-1.amazonaws.com"
+  // const port = "http://192.168.29.100:8080"
   useFocusEffect(
     React.useCallback(() => {
       // dispatch(getalluser())
@@ -135,16 +135,16 @@ const Account = () => {
     return new Promise(resolve => setTimeout(resolve, timeout));
 }
   useEffect(() => {
-    const socket = io(port)
+    // const socket = io(port)
 
-    socket.on('update', function (data) {
-      console.log('del announcement:', data);
-      if (String(userad._id) == String(data)) {
-        // setModalVisible(false)
-        setload(false)
-        setrelaod(data)
-      }
-    })
+    // socket.on('update', function (data) {
+    //   console.log('del announcement:', data);
+    //   if (String(userad._id) == String(data)) {
+    //     // setModalVisible(false)
+    //     setload(false)
+    //     setrelaod(data)
+    //   }
+    // })
 
   }, [])
   // console.log("my nmn nbvvc",userad)

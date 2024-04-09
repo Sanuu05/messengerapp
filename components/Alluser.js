@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { useDispatch, useSelector } from 'react-redux'
 import Icon from 'react-native-vector-icons/Ionicons'
-import { io } from "socket.io-client"
+// import { io } from "socket.io-client"
 import { emploadmsg, getalluser, loadUser } from '../action/user'
 
 const { width, height } = Dimensions.get('screen')
@@ -19,20 +19,20 @@ const Alluser = () => {
     //     dispatch(loadUser())
 
     // }, [dispatch, username,picsucc])
-    const port ="https://newmsgm.herokuapp.com"
-// const port = "http://192.168.29.100:5555"
+    const port ="https://veajqzj9se.execute-api.ap-south-1.amazonaws.com"
+    // const port = "http://192.168.29.100:8080"
     useFocusEffect(
         React.useCallback(() => {
             dispatch(getalluser())
             dispatch(loadUser())
             dispatch(emploadmsg())
             
-            const socket = io(port)
-            socket.on('new-message', function (data) {
-                // console.log('Got announcement:', data);
-                setreload(data)
-                // setModalVisible(false)
-            });
+            // const socket = io(port)
+            // socket.on('new-message', function (data) {
+            //     // console.log('Got announcement:', data);
+            //     setreload(data)
+            //     // setModalVisible(false)
+            // });
         }, [dispatch])
 
 

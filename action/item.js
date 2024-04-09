@@ -1,8 +1,8 @@
 import Axios from 'axios'
 import {ADD_ITEMS, AUTH_ERROR, DELETE_ITEMS, GET_ERROR, GET_ITEMS, ITEMS_LOADING, UPDATE_ITEMS} from './types'
 
-const port ="https://msg-snya.onrender.com"
-// const port = "http://192.168.29.100:5555"
+const port ="https://veajqzj9se.execute-api.ap-south-1.amazonaws.com"
+// const port = "http://192.168.29.100:8080"
 
 export const getallitems = ()=> async(dispatch)=>{
     try {
