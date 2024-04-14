@@ -40,7 +40,7 @@ const Login = () => {
     email: "",
     password: "",
     name: "",
-    cpassword: "",
+    confirmPassword: "",
   });
   const [loading, setloading] = useState(false);
   const navigate = useNavigation();
@@ -49,62 +49,60 @@ const Login = () => {
   const wait = (timeout) => {
     return new Promise((resolve) => setTimeout(resolve, timeout));
   };
-  useFocusEffect(
-    React.useCallback(() => {
-      setactive(true);
-      wait(8000).then(() => {
-        setactive(false);
-      });
-    }, [dispatch])
-  );
-  const postData = () => {
+  // console.log(">>>>>>>>>>>>>>>>>>>>",data)
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     setactive(true);
+  //     wait(8000).then(() => {
+  //       setactive(false);
+  //     });
+  //   }, [dispatch])
+  // );
+ 
+  const postData =async () => {
     if (data?.email && data?.password) {
-      setloading(true);
-      console.log(loading);
-      signInWithEmailAndPassword(auth, data.email, data.password)
-        .then((userCredential) => {
-          if (userCredential?.user?.emailVerified) {
-            dispatch(loguser({ email: userCredential.user.email }));
-            setloading(false);
-          } else {
-            alert("User email id is not verified");
-            setloading(false);
-          }
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          setloading(false);
-          // ..
-          //   console.table(error);
-          alert(error?.message);
-        });
+      // setloading(true);
+      // console.log(loading);
+      const responseData =await  dispatch(loguser(data));
+      console.log(">>>>>>>>>>>>>>>>>>>>>>>ss",responseData)
     } else {
+      setloading(false)
     }
   };
   const auth = getAuth();
-  const submit = () => {
-    // dispatch(userSign(data))
-    if (data.email && data.name && data.cpassword && data.password) {
-      if (data.password === data.cpassword) {
-        createUserWithEmailAndPassword(auth, data.email, data.password)
-          .then((userCredential) => {
-            const user = userCredential.user;
-            sendEmailVerification(user);
-            dispatch(
-              userSign({ email: data.email.toLowerCase(), name: data.name })
-            );
-          })
-          .catch((error) => {
-            alert(error?.message);
-          });
-      } else {
-        alert("Enter same password");
-      }
-    } else {
-      alert("Fill All field");
+  const submit = async () => {
+    const { email, name, password, confirmPassword } = data;
+  
+    if (!email || !name || !password || !confirmPassword) {
+      alert("Please fill in all fields.");
+      return;
+    }
+  
+    if (password !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+  
+    try {
+      // Convert email to lowercase and dispatch the signup action
+      // const userData = { email: email.toLowerCase(), name };
+      const response = await dispatch(userSign(data));
+  
+      // Use the response data from the dispatched action
+      console.log("Signup response:", response);
+  
+      // // Optionally, you can handle different scenarios based on response status or data
+      // if (response.success) {
+      //   alert("Signup successful!");
+      // } else {
+      //   alert("Signup failed: " + response.message);
+      // }
+    } catch (error) {
+      console.error("Signup failed:", error?.response);
+      alert("Signup process failed, please try again.");
     }
   };
+  
   const authToken = useSelector((state) => state.user.token);
 
   const authUser = useSelector((state) => state.user.user);
@@ -114,15 +112,15 @@ const Login = () => {
       dispatch(loadUser());
     }, [dispatch, authToken])
   );
-  useFocusEffect(
-    React.useCallback(() => {
-      if (authUser?.user) {
-        navigate.navigate("Bottom");
-      } else {
-        navigate.navigate("Login");
-      }
-    }, [dispatch, authUser])
-  );
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     if (authUser?.user) {
+  //       navigate.navigate("Bottom");
+  //     } else {
+  //       navigate.navigate("Login");
+  //     }
+  //   }, [dispatch, authUser])
+  // );
   useFocusEffect(
     React.useCallback(() => {
       if (SignUpSuccess) {
@@ -340,7 +338,7 @@ const Login = () => {
                       placeholder="Confirm Password"
                       style={styles?.textInputStyle}
                       onChangeText={(text) =>
-                        setdata({ ...data, cpassword: text })
+                        setdata({ ...data, confirmPassword: text })
                       }
                     />
                     <View

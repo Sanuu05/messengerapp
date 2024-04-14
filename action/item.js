@@ -1,13 +1,14 @@
 import Axios from 'axios'
 import {ADD_ITEMS, AUTH_ERROR, DELETE_ITEMS, GET_ERROR, GET_ITEMS, ITEMS_LOADING, UPDATE_ITEMS} from './types'
+import { baseUrl } from '../config/main';
 
-const port ="https://veajqzj9se.execute-api.ap-south-1.amazonaws.com"
-// const port = "http://192.168.29.100:8080"
+// const baseUrl ="https://veajqzj9se.execute-api.ap-south-1.amazonaws.com"
+// const baseUrl = "http://192.168.29.100:8080"
 
 export const getallitems = ()=> async(dispatch)=>{
     try {
         dispatch({ type: ITEMS_LOADING });
-        const itemData = await Axios.get(`${port}/item/all`)
+        const itemData = await Axios.get(`${baseUrl}/item/all`)
         dispatch({type:GET_ITEMS, payload:itemData})
     } catch (error) {
         dispatch({type:AUTH_ERROR})
@@ -17,7 +18,7 @@ export const getitem = ()=> async(dispatch)=>{
     try {
         dispatch({ type: ITEMS_LOADING });
         const token = localStorage.getItem('token')
-        const itemData = await Axios.get(`${port}/item/get`, { headers: { "x-auth-token": token } })
+        const itemData = await Axios.get(`${baseUrl}/item/get`, { headers: { "x-auth-token": token } })
         dispatch({type:GET_ITEMS, payload:itemData})
     } catch (error) {
         dispatch({type:AUTH_ERROR})
@@ -27,7 +28,7 @@ export const getfollowingitem = ()=> async(dispatch)=>{
     try {
         dispatch({ type: ITEMS_LOADING });
         const token = localStorage.getItem('token')
-        const itemData = await Axios.get(`${port}/item/allfollowing`, { headers: { "x-auth-token": token } })
+        const itemData = await Axios.get(`${baseUrl}/item/allfollowing`, { headers: { "x-auth-token": token } })
         dispatch({type:GET_ITEMS, payload:itemData})
     } catch (error) {
         dispatch({type:AUTH_ERROR})
@@ -39,7 +40,7 @@ export const additem = (data)=>async(dispatch)=>{
         
         const token = localStorage.getItem('token')
         // console.log(data)
-        const addData = await Axios.post(`${port}/item/post`,data ,{ headers: { "x-auth-token": token } })
+        const addData = await Axios.post(`${baseUrl}/item/post`,data ,{ headers: { "x-auth-token": token } })
         dispatch({type:ADD_ITEMS, payload:addData})
     } catch (error) {
         dispatch({type:GET_ERROR, payload: error.response})

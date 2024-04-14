@@ -14,42 +14,23 @@ const Alluser = () => {
     const navigate = useNavigation()
     const dispatch = useDispatch()
     const [reload, setreload] = useState()
-    // useEffect(() => {
-    //     dispatch(getalluser())
-    //     dispatch(loadUser())
-
-    // }, [dispatch, username,picsucc])
-    const port ="https://veajqzj9se.execute-api.ap-south-1.amazonaws.com"
-    // const port = "http://192.168.29.100:8080"
+    const alluser = useSelector((state => state?.all?.alluser))
+    console.log({alluser})
     useFocusEffect(
         React.useCallback(() => {
             dispatch(getalluser())
-            dispatch(loadUser())
-            dispatch(emploadmsg())
-            
-            // const socket = io(port)
-            // socket.on('new-message', function (data) {
-            //     // console.log('Got announcement:', data);
-            //     setreload(data)
-            //     // setModalVisible(false)
-            // });
         }, [dispatch])
 
 
     )
     const [refreshing, setRefreshing] = useState(false);
 
-
-    const user = useSelector((state => state.all.alluser))
-    const succ = useSelector((state) => state.user.token)
-    const userad = useSelector((state => state.user.user))
-    // console.log('userdatsas',userad?.alluser)
     const Chatlist = ({ v }) => {
         const user = useSelector((state => state.user.user))
 
-        const filter = user?.user?.msg?.filter(p => p.user == v?._id)
+        // const filter = user?.user?.msg?.filter(p => p.user == v?._id)
 
-        const latest = filter[0]
+        // const latest = filter[0]
         // console.log('vbvb',latest)
         if (user?.user?._id === v?._id) {
             return null
@@ -62,14 +43,7 @@ const Alluser = () => {
                     }} style={{ height: 55, width: 55, resizeMode: 'cover', borderRadius: 999 }} />
                     <View style={{ marginLeft: 13, marginTop: 2, borderBottomColor: '#8B8585', flex: 1 }}>
                         <Text style={{ fontSize: 21, fontFamily: 'Alegreya_700Bold', letterSpacing: 1,color:'#676D6F' }}>{v?.name}</Text>
-                        {
-                            latest?.text ? <Text style={{ fontSize: 13, fontFamily: 'Alegreya_500Medium', letterSpacing: 1,color:'#C9CBD5' }}>{latest?.text}</Text> : null
-
-                        }
-                        {
-                            latest?.pic ? <Text style={{ fontSize: 13, fontFamily: 'Alegreya_500Medium', letterSpacing: 1,color:'#C9CBD5' }}>image</Text> : null
-
-                        }
+                        <Text style={{ fontSize: 13, fontFamily: 'Alegreya_500Medium', letterSpacing: 1, color: '#C9CBD5' }}>{v?.email}</Text>    
 
                     </View>
                 </TouchableOpacity>
@@ -81,12 +55,7 @@ const Alluser = () => {
     // const setseaarch =(val)=>{
 
     // }
-    const [alluser, setalluser] = useState()
-    useEffect(()=>{
 
-        // console.log('serch',serach)
-        const filte = serach? setalluser(user?.filter(p=>p.name==serach || p.email==serach)):setalluser(user)
-    },[serach,reload,userad])
     return (
 
         <SafeAreaView style={{ backgroundColor: 'white',display:'flex',flexDirection:'column' }}>

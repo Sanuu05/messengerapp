@@ -2,7 +2,7 @@
   "expo": {
     "name": "messenger",
     "slug": "messenger",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -35,5 +35,6 @@
         "projectId": "0a8b389d-0915-48b2-bf2d-a276bfe0c24b"
       }
     }
+    
   }
 }

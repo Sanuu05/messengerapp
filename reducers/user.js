@@ -4,7 +4,7 @@ const initialState = {
     // token: await AsyncStorage.getItem('tokenmain'),
     isAuthenticated: false,
     isLoading: false,
-    user: [],
+    user:null,
     signin: false,
     load: false,
     oneuser: []
@@ -15,6 +15,7 @@ const user = (state = initialState, action) => {
         case USER_LOADING:
             return {
                 ...state,
+                user:action.payload.user,
                 isLoading: true
 
             }
@@ -55,9 +56,11 @@ const user = (state = initialState, action) => {
         case LOGIN_SUCCESS:
             AsyncStorage.setItem('tokenmain', action.payload.token)
             AsyncStorage.setItem('user', JSON.stringify(action.payload.user))
+            console.log("???????????????????????????????????????",action.payload)
             return {
                 ...state,
                 ...action.payload,
+                user:action.payload.user,
                 isAuthenticated: true,
                 isLoading: false
 
@@ -80,7 +83,7 @@ const user = (state = initialState, action) => {
             return {
                 ...state,
                 token: null,
-                user: [],
+                user: null,
                 isAuthenticated: false,
                 isLoading: false
             }

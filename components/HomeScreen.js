@@ -13,16 +13,14 @@ const HomeScreen = () => {
     const navigate = useNavigation()
     const dispatch = useDispatch()
     const [reload, setreload] = useState()
-    const port = "https://veajqzj9se.execute-api.ap-south-1.amazonaws.com"
-    // const port = "http://192.168.137.1:8080"
+    // const baseUrl = "https://veajqzj9se.execute-api.ap-south-1.amazonaws.com"
+    // const baseUrl = "http://192.168.137.1:8080"
     const appState = useRef(AppState.currentState);
     const [appStateVisible, setAppStateVisible] = useState(appState.current);
     const succtok = useSelector((state) => state.user.token)
     const userad = useSelector((state => state.user.user))
     const userall = useSelector((state => state.all?.allActiveUser))
-    const userId = useSelector((state => state?.user?.user?.user?._id))
     const [token, settoken] = useState()
-    console.log('tokenn', userall)
     useEffect(() => {
         const subscription = AppState.addEventListener("change", nextAppState => {
             if (
@@ -30,7 +28,7 @@ const HomeScreen = () => {
                 nextAppState === "active"
             ) {
                 console.log("App has come to the foreground!", userad?.user?._id);
-                dispatch(editprofilepic({ online: true }))
+                // dispatch(editprofilepic({ online: true }))
                 setreload(true)
             }
 
@@ -40,7 +38,7 @@ const HomeScreen = () => {
             if (appState.current === "background") {
                 // console.log('offs', userad?.user?._id)
                 setreload(false)
-                dispatch(editprofilepic({ online: false }))
+                // dispatch(editprofilepic({ online: false }))
             }
         });
 
@@ -86,7 +84,7 @@ const HomeScreen = () => {
   
     const succ = useSelector((state) => state.user.token)
     const Chatlist = ({ v, serach }) => {
-        console.log('userx',v)
+        // console.log('userx',v)
         const user = useSelector((state => state.user.user))
         // const filter = user?.user?.msg?.filter(p => p.user == v?._id)
         // const latest = filter ? filter[0] : null

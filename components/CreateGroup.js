@@ -17,8 +17,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { getalluser } from "../action/user";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { baseUrl } from "../config/main";
 const CreateGroup = () => {
-  const port = "https://veajqzj9se.execute-api.ap-south-1.amazonaws.com";
+  // const baseUrl = "https://veajqzj9se.execute-api.ap-south-1.amazonaws.com";
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [name, setName] = useState("");
   const navigation = useNavigation();
@@ -29,7 +30,7 @@ const CreateGroup = () => {
     React.useCallback(() => {
       dispatch(getalluser());
 
-      // const socket = io(port)
+      // const socket = io(baseUrl)
       // socket.on('new-message', function (data) {
       //     // console.log('Got announcement:', data);
       //     setreload(data)
@@ -50,7 +51,7 @@ const CreateGroup = () => {
       console.log(">>>>>>>>");
       const token = await AsyncStorage.getItem("tokenmain");
       const { data } = await axios.post(
-        `${port}/auth/creategrp`,
+        `${baseUrl}/auth/creategrp`,
         { name: name, members: selectedUsers },
         { headers: { "x-auth-token": token } }
       );

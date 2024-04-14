@@ -26,8 +26,8 @@ const Message = (props) => {
     const [reload, setreload] = useState()
     const [allMsg,setAllMsg]= useState([])
     // console.log('mmm',)
-    // const port = "https://msg-snya.onrender.com"
-    // const port = "http://192.168.137.1:5555"
+    // const baseUrl = "https://msg-snya.onrender.com"
+    // const baseUrl = "http://192.168.137.1:5555"
 
     const userad = useSelector((state => state?.user?.user?.user?._id))
     const mainer = useSelector(state => state?.user)
@@ -37,7 +37,7 @@ const Message = (props) => {
     const filter = user.find(p => p._id == props.route?.params?._id)
     const msg = useSelector((state) => state.allmsg.allmsg?.msg)
     const muser = useSelector((state) => state.allmsg.allmsg?.user)
-    // const socket = io(port)
+    // const socket = io(baseUrl)
     // console.log(">>>>>>>>>>>>>>>>",props.route?.params?.type)
     useEffect(()=>{
         setAllMsg(msg)
@@ -70,7 +70,7 @@ const Message = (props) => {
         });
         socket.on('connected',function (data) {
             // setAllMsg((prev)=>[...prev,data])
-            console.log(">>>>>>>>>>>>>>>>>>>>.connected",data)
+            // console.log(">>>>>>>>>>>>>>>>>>>>.connected",data)
         });
         // socket.on('new-message', function (data) {
         //     if (String(userad) == String(data?.id) || String(userad) == String(data?.sid)) {
@@ -135,10 +135,12 @@ const Message = (props) => {
         // console.log('bvb')
         if (msgres) {
             // dispatch(sendmsg(msgres, (props.route?.params?._id), null))
-            // const socket = io(port)
+            // const socket = io(baseUrl)
             if(props.route.params?.type=="group"){
+                
                 socket.emit('chatMessage',{content: msgres,groupId:props.route?.params?._id,senderId:userad,type:'text'});
             }else{
+                console.log({content: msgres,groupId:props.route?.params?._id,senderId:userad,type:'text'})
                 socket.emit('chatMessage',{content: msgres,receiverId:props.route?.params?._id,senderId:userad,type:'text'});
             }
            
@@ -280,7 +282,7 @@ const Message = (props) => {
 
         useFocusEffect(
             React.useCallback(() => {
-                // const socket = io(port)
+                // const socket = io(baseUrl)
 
                 socket.on('chatMessage', function (data) {
                     // console.log('del announcement:', data);

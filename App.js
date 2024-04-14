@@ -1,11 +1,12 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import {NavigationContainer} from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import {Provider, useDispatch, useSelector} from 'react-redux';
-import { createStore, applyMiddleware, compose} from 'redux'
-import thunk from 'redux-thunk'
-import reducers from './reducers'
+import { StatusBar } from "expo-status-bar";
+import { Image, StyleSheet, Text, View } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { createStore, applyMiddleware, compose } from "redux";
+import thunk from "redux-thunk";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import reducers from "./reducers";
 import {
   useFonts,
   Alegreya_400Regular,
@@ -17,24 +18,21 @@ import {
   Alegreya_800ExtraBold,
   Alegreya_800ExtraBold_Italic,
   Alegreya_900Black,
-  Alegreya_900Black_Italic
-} from '@expo-google-fonts/alegreya'
-import AppLoading from 'expo-app-loading';
-import Bottonav from './components/Bottonav';
-import Message from './components/Message';
+  Alegreya_900Black_Italic,
+} from "@expo-google-fonts/alegreya";
+import Bottonav from "./components/Bottonav";
+import Message from "./components/Message";
 const Stack = createNativeStackNavigator();
-const store = createStore(reducers, compose(applyMiddleware(thunk)))
-import { useEffect } from 'react';
-import CreateGroup from './components/CreateGroup';
-import Login from './screens/Login';
+const store = createStore(reducers, compose(applyMiddleware(thunk)));
+import React, { useEffect, useState } from "react";
+import splash from "./assets/splash.png";
+import CreateGroup from "./components/CreateGroup";
+import Login from "./screens/Login";
+import { loadUser } from "./action/user";
+import { baseUrl } from "./config/main";
+import Main from "./Main";
 
 export default function App() {
-
-  // const userId = useSelector((state => state?.user?.user?.user?._id))
-  // useEffect(()=>{
-  //   socket.emit('authenticate', userId);
-
-  // },[])
   let [fontsLoaded] = useFonts({
     Alegreya_400Regular,
     Alegreya_400Regular_Italic,
@@ -45,42 +43,25 @@ export default function App() {
     Alegreya_800ExtraBold,
     Alegreya_800ExtraBold_Italic,
     Alegreya_900Black,
-    Alegreya_900Black_Italic
-
-  })
+    Alegreya_900Black_Italic,
+  });
   if (!fontsLoaded) {
-    return <AppLoading />;
+    return <Text>Is Loading</Text>;
   } else {
 
-  return (
-    <Provider store={store}>
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name='Login'component={Login} options={{
-          headerShown:false
-        }}  />
-        <Stack.Screen name="Bottom" component={Bottonav} options={{
-          headerShown:false
-        }} />
-         <Stack.Screen name="Msg" component={Message} options={{
-          headerShown:false
-        }} />
-          <Stack.Screen name="CreateGroup" component={CreateGroup} options={{
-          headerShown:false
-        }} />
-        
-      </Stack.Navigator>
-      </NavigationContainer>
+    return (
+      <Provider store={store}>
+        <Main />
       </Provider>
-  );
+    );
   }
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
