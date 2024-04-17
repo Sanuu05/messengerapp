@@ -95,7 +95,7 @@ const HomeScreen = () => {
 
                 <TouchableOpacity activeOpacity={0.8} style={{ display: 'flex', flexDirection: 'row', marginTop: 10, alignItems: 'stretch' }} onPress={() => navigate.navigate('Msg', {...v,type:v?.userDetails?"user":"group"})} >
                     <Image source={{
-                        uri: v?.userDetails?.profilePic ? v?.userDetails?.profilePic? v?.groupDetails?.profilePic: v?.groupDetails?.profilePic : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
+                        uri: v?.userDetails?.profilePic ? v?.userDetails?.profilePic? v?.userDetails?.profilePic: v?.groupDetails?.profilePic : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'
                     }} style={{ height: 55, width: 55, resizeMode: 'cover', borderRadius: 999 }} />
                     <View style={{ marginLeft: 13, marginTop: 2, borderBottomColor: '#8B8585', flex: 1 }}>
                         <Text style={{ fontSize: 21, fontFamily: 'Alegreya_700Bold', letterSpacing: 1, color: '#676D6F' }}>{v?.userDetails?.name ? v?.userDetails?.name:v?.groupDetails?.name}</Text>

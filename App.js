@@ -20,8 +20,8 @@ import {
   Alegreya_900Black,
   Alegreya_900Black_Italic,
 } from "@expo-google-fonts/alegreya";
-import Bottonav from "./components/Bottonav";
-import Message from "./components/Message";
+import Bottonav from "./screens/Bottonav";
+import Message from "./screens/Message";
 const Stack = createNativeStackNavigator();
 const store = createStore(reducers, compose(applyMiddleware(thunk)));
 import React, { useEffect, useState } from "react";

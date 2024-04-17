@@ -180,8 +180,7 @@ export const delmsg = (id) => async (dispatch, getState) => {
         // alert(id)
         console.log('vbvb',id)
         const token = await AsyncStorage.getItem('tokenmain')
-        const data  = await Axios.put(`${baseUrl}/auth/delmsg`,{id:id}, { headers: { "x-auth-token": token } })
-        // console.log('tok', data)
+        const data  = await Axios.delete(`${baseUrl}/item/deleteMessage/${id}`,{ headers: { "x-auth-token": token } })
         
         // console.log("daa",data)
         // dispatch({ type: "POSTMSG", payload: data })
