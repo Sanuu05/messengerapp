@@ -11,6 +11,9 @@ import Login from "./screens/Login";
 import splash from "./assets/splash.png";
 import { useState } from "react";
 import { loadUser } from "./action/user";
+import UserDetails from "./screens/UserDetails";
+import OTPScreen from "./screens/OTPScreen";
+import ResetPassword from "./screens/ResetPassword";
 
 const Main = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -53,9 +56,19 @@ const Main = () => {
             <Stack.Screen name="Bottom" component={Bottonav} />
             <Stack.Screen name="Msg" component={Message} />
             <Stack.Screen name="CreateGroup" component={CreateGroup} />
+            <Stack.Screen name="UserDetails" component={UserDetails} />
+            
+
           </>
         ) : (
+          <>
+           
           <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="OTPScreen" component={OTPScreen} />
+          <Stack.Screen name="ResetPassword" component={ResetPassword} />
+        
+          
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>

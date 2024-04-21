@@ -31,6 +31,7 @@ import Login from "./screens/Login";
 import { loadUser } from "./action/user";
 import { baseUrl } from "./config/main";
 import Main from "./Main";
+import Toast from "react-native-toast-message";
 
 export default function App() {
   let [fontsLoaded] = useFonts({
@@ -51,7 +52,11 @@ export default function App() {
 
     return (
       <Provider store={store}>
+        <>
         <Main />
+        <Toast />
+        </>
+       
       </Provider>
     );
   }

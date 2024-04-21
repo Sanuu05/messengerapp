@@ -32,6 +32,7 @@ import socket from "../action/socketManager";
 import Axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { baseUrl } from "../config/main";
+import Header from "../components/Header";
 // import { Button } from 'react-native-web'
 
 const Message = (props) => {
@@ -126,13 +127,15 @@ const Message = (props) => {
   const delmsg = async (id) => {
     console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", id);
     try {
-      const token = await AsyncStorage.getItem('tokenmain')
-      const data  = await Axios.delete(`${baseUrl}/item/deleteMessage/${id}`,{ headers: { "x-auth-token": token } })
-      console.log("?????????????????????",data)
-      setAllMsg([...allMsg?.filter((item)=>item?._id!=id)])
-      setModalVisible(false)
+      const token = await AsyncStorage.getItem("tokenmain");
+      const data = await Axios.delete(`${baseUrl}/item/deleteMessage/${id}`, {
+        headers: { "x-auth-token": token },
+      });
+      console.log("?????????????????????", data);
+      setAllMsg([...allMsg?.filter((item) => item?._id != id)]);
+      setModalVisible(false);
     } catch (error) {
-        console.log(">>>>>>>>>>>>>>>>>",error)
+      console.log(">>>>>>>>>>>>>>>>>", error);
     }
   };
   const submit = () => {
@@ -357,7 +360,7 @@ const Message = (props) => {
                       elevation: 1,
                       borderRadius: 10,
                     }}
-                    onPress={() => (delmsg(delitem?.id))}
+                    onPress={() => delmsg(delitem?.id)}
                   >
                     <Text
                       style={{
@@ -408,7 +411,7 @@ const Message = (props) => {
               backgroundColor: v?.senderId == userad ? "#2176FF" : "#F4F4F4",
               alignSelf: v?.senderId == userad ? "flex-end" : "flex-start",
               marginTop: 0,
-              color: v?.senderId == userad ? "#BCD7FF" : "#8D9293",
+              color: v?.senderId == userad ? "#fff" : "#8D92a2",
               minWidth: 130,
               textAlign: "center",
               marginHorizontal: 15,
@@ -550,114 +553,11 @@ const Message = (props) => {
                     <Text style={styles.textStyle}>Show Modal</Text>
                 </Pressable> */}
         </View>
-        <View
-          style={{
-            elevation: 0,
-            paddingBottom: 15,
-            backgroundColor: "white",
-            position: "relative",
-            height: 50,
-            zIndex: 100,
-            width: "100%",
-            display: "flex",
-            flexDirection: "row",
-            top: 0,
-            justifyContent: "flex-start",
-            alignItems: "center",
-          }}
-        >
-          {/* style={{ position: 'absolute', zIndex: 99, left: 10, top: 0 }} */}
-          {/* <Text>Back</Text> */}
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#F2F2F2",
-              elevation: 0,
-              marginLeft: 15,
-              height: 45,
-              width: 45,
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: 10,
-            }}
-            onPress={() => {
-              // dispatch(emploadmsg())
-              navigate.goBack();
-            }}
-          >
-            <Icon1
-              name="angle-left"
-              color="#BFBFBF"
-              size={30}
-              style={{ marginTop: 0, marginLeft: 0, zIndex: 99 }}
-            />
-          </TouchableOpacity>
-
-          <View style={{ marginLeft: 20 }}>
-            <View
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "flex-start",
-                alignItems: "center",
-              }}
-            >
-              <Image
-                source={{
-                  uri: muser?.profilePic
-                    ? muser?.profilePic
-                    : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
-                }}
-                style={{
-                  width: 45,
-                  height: 45,
-                  resizeMode: "cover",
-                  borderRadius: 999,
-                }}
-              />
-              <View
-                style={{
-                  marginLeft: 10,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "flex-start",
-                  alignItems: "flex-start",
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontFamily: "Alegreya_700Bold",
-                    textAlign: "center",
-                    marginTop: 0,
-                    padding: 0,
-                    color: "#6B7073",
-                  }}
-                >
-                  {muser?.name}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 13,
-                    fontFamily: "Alegreya_400Regular",
-                    textAlign: "center",
-                    marginTop: 0,
-                    padding: 0,
-                    color: muser?.online ? "#86C7BF" : "red",
-                  }}
-                >
-                  {muser?.online ? "Online" : "Offline"}
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          {/* <TouchableOpacity style={{ position: 'absolute', zIndex: 99, right: 10, top: 2 }}>
-                  
-                    <Icon name='information-circle-outline' color="grey" size={28} style={{ marginTop: 10, marginLeft: 15, zIndex: 99 }} onPress={() => setModalVisible(true)} />
-                </TouchableOpacity> */}
-        </View>
+        <Header
+          onGoBack={() => navigate.goBack()}
+          onPressHeader={() => navigate.navigate("UserDetails")}
+          data={muser}
+        />
       </View>
     );
   };

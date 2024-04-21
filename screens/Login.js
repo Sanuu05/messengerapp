@@ -9,13 +9,15 @@ import {
   ActivityIndicator,
   Platform,
 } from "react-native";
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { loadUser, loguser, userSign } from "../action/user";
+import { loadUser, loguser, sendOtp, userSign } from "../action/user";
 import icon from "../assets/chaticon.jpg";
 import { TextInput } from "react-native-paper";
+import Toast from "react-native-toast-message";
+import Loader from "../components/Loader";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -28,57 +30,116 @@ const Login = () => {
     name: "",
     confirmPassword: "",
   });
-  const [loading, setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const postData = async () => {
-    if (data?.email && data?.password) {
-      const responseData = await dispatch(loguser(data));
-      console.log({responseData})
-    } else {
-      setloading(false);
+    try {
+      setLoading(true);
+      if (data?.email && data?.password) {
+        const responseData = await dispatch(loguser(data));
+        if (responseData) {
+          Toast.show({
+            type: "success",
+            text1: "Login Successful",
+          });
+        }
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Fill all the fields",
+        });
+      }
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Login process failed, please try again.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
   const submit = async () => {
     const { email, name, password, confirmPassword } = data;
 
     if (!email || !name || !password || !confirmPassword) {
-      alert("Please fill in all fields.");
+      Toast.show({
+        type: "error",
+        text1: "Please fill in all fields.",
+      });
       return;
     }
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match.");
+      Toast.show({
+        type: "error",
+        text1: "Passwords do not match.",
+      });
       return;
     }
-
+    setLoading(true);
     try {
-      const response = await dispatch(userSign(data));
-      console.log("Signup response:", response);
+      const response = await userSign(data);
+      if (response) {
+        setlogin(true);
+        setdata({
+          email: "",
+          password: "",
+          name: "",
+          confirmPassword: "",
+        });
+        Toast.show({
+          type: "success",
+          text1: response,
+        });
+        // console.log("Signup response:", response);
+      }
     } catch (error) {
-      console.error("Signup failed:", error?.response);
-      alert("Signup process failed, please try again.");
+      Toast.show({
+        type: "error",
+        text1: "Signup process failed, please try again.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   const authToken = useSelector((state) => state.user.token);
-  const SignUpSuccess = useSelector((state) => state.user.signin);
   useFocusEffect(
     React.useCallback(() => {
+      setlogin(true);
+      setforget(false);
       dispatch(loadUser());
     }, [dispatch, authToken])
   );
 
-  useFocusEffect(
-    React.useCallback(() => {
-      if (SignUpSuccess) {
-        setlogin(true);
+  const navigation = useNavigation();
+  const forgetpass = async (e) => {
+    setLoading(true);
+    try {
+      if (data.email) {
+        const response = await sendOtp({ email: data.email });
+        if (response) {
+          Toast.show({
+            type: "success",
+            text1: response?.message,
+          });
+          navigation.navigate("OTPScreen", {
+            email: data.email,
+          });
+        }
+      } else {
+        Toast.show({
+          type: "error",
+          text1: "Send Otp process failed, please try again.",
+        });
       }
-    }, [dispatch, SignUpSuccess])
-  );
-
-  const forgetpass = (e) => {
-    if (data.email) {
-    } else {
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Send Otp process failed, please try again.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -95,6 +156,7 @@ const Login = () => {
           paddingHorizontal: 10,
         }}
       >
+        <Loader isVisible={loading} />
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           enabled={true}
@@ -195,8 +257,6 @@ const Login = () => {
                         </View>
                       </TouchableOpacity>
                     </View>
-                  ) : loading ? (
-                    <ActivityIndicator size="large" color="#32CCFE" />
                   ) : (
                     <View
                       style={{
